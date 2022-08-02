@@ -1,17 +1,22 @@
-console.log("hello")
+
 const CART_KEY = "cart_key"
 const items = JSON.parse(localStorage.getItem(CART_KEY))
 
 
 
 const cartItem = document.getElementById("cart__items")
-function afficherPanier() {
+
+async function afficherPanier() {
   if (items === null || items.length == 0) {
     cartItem.innerHTML += `<h1>Mon panier est vide</h1>`
   }
   else {
     for (i = 0; i < items.length; i++) {
       let product = items[i]
+      const productApi = await fetch(`http://localhost:3000/api/products/${product.id}`)
+      const productInfo = await productApi.json()
+      product.price = productInfo.price
+      console.log("productInfo", productInfo);
       console.log("items:", items);
       console.log("items color:", product.color)
       cartItem.innerHTML += `<article class="cart__item" data-id="${product.id}" data-color="{product-color}">
@@ -22,7 +27,7 @@ function afficherPanier() {
           <div class="cart__item__content__description">
             <h2>${product.title}</h2>
             <p>${product.color}</p>
-            <p>${product.price} €</p>
+            <p>${productInfo.price} €</p>
           </div>
           <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
@@ -36,7 +41,14 @@ function afficherPanier() {
         </div>
       </article>`;
     }
-
+     
+const result = items.reduce(reducer, { totalPrice: 0, numbersArticle: 0 });
+console.log(result);
+// le code html du prix totale a affiche
+const totalQty = document.getElementById("totalQuantity")
+totalQty.innerHTML += `<span id="totalQuantity">${result.numbersArticle}</span>`;
+const totalPrice = document.getElementById("totalPrice")
+totalPrice.innerHTML += `<span id="totalPrice">${result.totalPrice}</span>`;
 
   }
 
@@ -56,13 +68,7 @@ const reducer = (accumulator, item) => {
 };
 
 
-const result = items.reduce(reducer, { totalPrice: 0, numbersArticle: 0 });
-console.log(result);
-// le code html du prix totale a affiche
-const totalQty = document.getElementById("totalQuantity")
-totalQty.innerHTML += `<span id="totalQuantity">${result.numbersArticle}</span>`;
-const totalPrice = document.getElementById("totalPrice")
-totalPrice.innerHTML += `<span id="totalPrice">${result.totalPrice}</span>`;
+
 
 
 const addOrRemoveItemfromCart = (qty, productId, productColor) => {
@@ -105,11 +111,8 @@ btnEnvoyerFormulaire.addEventListener("click", (e) => {
   console.log("formulaireValues", formulaireValues);
 
   // *********************      création gestion validation du formulaire *******
-  const textAlert = (value) => {
-    return `${value} : Ne pas depasser 20 caractères, minimum 3 caractères\nChiffre et symbole ne sont pas autorisé`;
-  }
 
-  const regExfirstNameLastNameCity = (value) => {
+    const regExfirstNameLastNameCity = (value) => {
     return /^[A-Za-z]{3,20}$/.test(value);
   }
 
@@ -196,7 +199,6 @@ btnEnvoyerFormulaire.addEventListener("click", (e) => {
     return;
   }
 
-  // console.log("firstName", firstName)
 
   // fin **********************************************
 
@@ -230,7 +232,7 @@ btnEnvoyerFormulaire.addEventListener("click", (e) => {
    })
    .then((redirection) => {
     localStorage.clear();
-     document.location.href="./confirmation.html?id="+ redirection.orderId;
+     document.location.href="./confirmation.html?orderId="+ redirection.orderId;
      console.log("redirection", redirection);
    })
 

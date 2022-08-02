@@ -1,9 +1,11 @@
-console.log('hello')
+// Apelle de l'API
 fetch('http://localhost:3000/api/products')
+// .then et une convertion en format JSON qui retourne mes produit dans un tableau
 .then((resultat) => {
     console.log (resultat)
     return resultat.json();
   })
+  // for ajoute l'affichage dans le tableau 1 par 1
 .then((produits)=>{
     console.log (produits)
     const items = document.getElementById('items')

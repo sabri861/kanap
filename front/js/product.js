@@ -1,13 +1,9 @@
+// recuperation de l'id
+const params = new URLSearchParams(document.location.search);
+let id = params.get("id");
+// fin **********
 
-const params = new URLSearchParams(document.location.href);
-
-
-let id
-for (let p of params) {
-    id = p[1]
-    console.log(p)
-}
-console.log(id)
+// fetch pour recuperer le detaille  du produit et son ID  ****************
 fetch(`http://localhost:3000/api/products/${id}`)
     .then(res => {
         return res.json()
@@ -23,7 +19,7 @@ fetch(`http://localhost:3000/api/products/${id}`)
             altTxt: _altTxt,
             id: _id,
         } = res;
-
+       // affichage sur le site ****
         let img = document.querySelector(".item__img");
         img.innerHTML = `<img src="${_imageUrl}" alt="${_altTxt}" id="productImage">`;
 
@@ -43,13 +39,13 @@ fetch(`http://localhost:3000/api/products/${id}`)
         };
 
     })
-
+// fin ******
 
 const addItemToCart = () => {
-    // dans la logic de l'écouteur, tu pourras utiliser l'api localStorage.setObj(key, value)
+    // je definie ma clée 
     const CART_KEY = "cart_key"
 
-    // on lit dans le local storage ou on prend une valeur vide par defaut
+    // recupartion de la clee dans  LocalStorage si il y a rien dedans sa renvoi un tableau vide 
     let cart = JSON.parse(localStorage.getItem(CART_KEY)) || []
     console.log("cart", cart)
 
@@ -60,8 +56,7 @@ const addItemToCart = () => {
     console.log("color", color);
     let img = document.getElementById("productImage").src;
     console.log("img" , img );
-    let price =document.getElementById("price").innerText;
-    console.log("price", price);
+    
     let title = document.getElementById("title").innerText;
     console.log("title", title);
     let btnPanier =document.getElementById("addToCart").value;
@@ -85,10 +80,7 @@ const addItemToCart = () => {
         return
     }
 
-    if(!btnPanier){
-        alert("élément(s) ajouté au panier")
-        
-    }
+   
     
     
     
@@ -97,12 +89,12 @@ const addItemToCart = () => {
         color: color,
         qty: qty,
         img: img,
-        price: price,
         title: title,
         altTxt: altTxt,
     }
     console.log("product", product);
-
+    
+    // voir si dans le localStorage il existe le meme kanape (meme id meme color)
     const found = cart.find(element => element.id === id && element.color === color)
     console.log("found", found)
 
@@ -115,12 +107,11 @@ const addItemToCart = () => {
 
 
     // et au finale on écrit les modifications de la donnée dans le localStorage
-    //const CART_KEY = product.id
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    console.log("kanape ajouté au panier")
+    alert("kanape ajouté au panier")
 }
 
-// ajouter un écouteur sur le onClick du bouton "Valider Mon Panier"
+// ajouter un écouteur sur le onClick du bouton "Ajouter au Panier"
 let btn = document.getElementById("addToCart");
 btn.addEventListener('click', addItemToCart);
 
